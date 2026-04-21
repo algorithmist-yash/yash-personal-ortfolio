@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Yash Raj — Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f; --surface: #111118; --border: rgba(255,255,255,0.07);
+      --accent: #e8ff47; --accent2: #47c8ff; --text: #e8e8f0; --muted: #6b6b80;
+      --font-display: 'Syne', sans-serif; --font-mono: 'DM Mono', monospace; --font-body: 'DM Sans', sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+
+    .cursor { width:10px;height:10px;background:var(--accent);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s;mix-blend-mode:difference; }
+    .cursor-ring { width:36px;height:36px;border:1px solid rgba(232,255,71,0.4);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .25s,height .25s; }
+
+    nav { position:fixed;top:0;left:0;right:0;z-index:100;padding:1.4rem 3rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid transparent;transition:border-color .3s,background .3s; }
+    nav.scrolled { background:rgba(10,10,15,0.92);backdrop-filter:blur(20px);border-color:var(--border); }
+    .nav-logo { font-family:var(--font-display);font-weight:800;font-size:1.25rem;letter-spacing:-.02em;color:var(--accent);text-decoration:none; }
+    .nav-links { display:flex;gap:2rem;list-style:none; }
+    .nav-links a { font-family:var(--font-mono);font-size:.75rem;color:var(--muted);text-decoration:none;letter-spacing:.06em;text-transform:uppercase;transition:color .2s; }
+    .nav-links a:hover { color:var(--accent); }
+    .hamburger { display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;z-index:101; }
+    .hamburger span { display:block;width:22px;height:2px;background:var(--text); }
+
+    #hero { min-height:100vh;display:flex;align-items:center;padding:8rem 3rem 4rem;position:relative;overflow:hidden; }
+    .hero-grid-bg { position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 70% at 50% 50%,black 30%,transparent 100%); }
+    .hero-glow { position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(232,255,71,0.08) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse 4s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.7} 50%{transform:translate(-50%,-50%) scale(1.1);opacity:1} }
+    .hero-content { position:relative;z-index:2;max-width:900px; }
+    .hero-badge { display:inline-flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-size:.75rem;color:var(--accent);border:1px solid rgba(232,255,71,0.3);padding:.4rem 1rem;border-radius:100px;margin-bottom:2rem;letter-spacing:.1em;animation:fadeUp .6s ease both; }
+    .badge-dot { width:6px;height:6px;background:var(--accent);border-radius:50%;animation:blink 1.5s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+    .hero-title { font-family:var(--font-display);font-size:clamp(3.5rem,8vw,7rem);font-weight:800;line-height:.95;letter-spacing:-.03em;margin-bottom:1.5rem;animation:fadeUp .6s .1s ease both; }
+    .hero-title .line-accent { color:var(--accent); }
+    .hero-title .line-dim { color:var(--muted); }
+    .hero-sub { font-size:1.1rem;color:var(--muted);max-width:520px;margin-bottom:3rem;animation:fadeUp .6s .2s ease both; }
+    .hero-cta { display:flex;gap:1rem;flex-wrap:wrap;animation:fadeUp .6s .3s ease both; }
+    .btn { font-family:var(--font-mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;padding:.9rem 2rem;border-radius:4px;transition:all .2s;cursor:pointer;border:none;display:inline-block; }
+    .btn-primary { background:var(--accent);color:#0a0a0f;font-weight:500; }
+    .btn-primary:hover { background:#fff;transform:translateY(-2px); }
+    .btn-outline { background:transparent;color:var(--text);border:1px solid var(--border); }
+    .btn-outline:hover { border-color:var(--accent);color:var(--accent);transform:translateY(-2px); }
+    .hero-stats { display:flex;gap:3rem;margin-top:5rem;padding-top:3rem;border-top:1px solid var(--border);animation:fadeUp .6s .4s ease both;flex-wrap:wrap; }
+    .stat-num { font-family:var(--font-display);font-size:2rem;font-weight:800;color:var(--accent); }
+    .stat-label { font-family:var(--font-mono);font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:.2rem; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+    section { padding:7rem 3rem; }
+    .section-label { font-family:var(--font-mono);font-size:.72rem;color:var(--accent);letter-spacing:.15em;text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:.75rem; }
+    .section-label::before { content:'';display:block;width:24px;height:1px;background:var(--accent); }
+    .section-title { font-family:var(--font-display);font-size:clamp(2rem,4vw,3rem);font-weight:800;letter-spacing:-.03em;margin-bottom:3.5rem; }
+
+    #about { background:var(--surface); }
+    .about-grid { display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start; }
+    .about-text p { color:var(--muted);font-size:1rem;margin-bottom:1.2rem; }
+    .about-text p strong { color:var(--text);font-weight:400; }
+    .skills-grid { display:grid;grid-template-columns:1fr 1fr;gap:.5rem; }
+    .skill-tag { font-family:var(--font-mono);font-size:.75rem;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:.5rem .85rem;border-radius:3px;transition:all .2s;letter-spacing:.03em; }
+    .skill-tag:hover { border-color:var(--accent);color:var(--accent); }
+
+    #projects { background:var(--bg); }
+    .filter-tabs { display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2.5rem; }
+    .filter-tab { font-family:var(--font-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;padding:.42rem 1rem;border-radius:100px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s; }
+    .filter-tab.active,.filter-tab:hover { border-color:var(--accent);color:var(--accent);background:rgba(232,255,71,0.06); }
+
+    .projects-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1px;background:var(--border); }
+    .project-card { background:var(--surface);padding:2.4rem;position:relative;overflow:hidden;transition:background .25s;display:flex;flex-direction:column; }
+    .project-card::before { content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);transform:scaleX(0);transition:transform .3s ease;transform-origin:left; }
+    .project-card:hover { background:#16161f; }
+    .project-card:hover::before { transform:scaleX(1); }
+    .project-card.hidden { display:none; }
+
+    .project-header { display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.8rem; }
+    .project-number { font-family:var(--font-mono);font-size:.65rem;color:var(--muted);letter-spacing:.1em; }
+    .project-category { font-family:var(--font-mono);font-size:.6rem;color:var(--accent2);letter-spacing:.08em;text-transform:uppercase;background:rgba(71,200,255,0.08);border:1px solid rgba(71,200,255,0.2);padding:.18rem .5rem;border-radius:2px; }
+    .project-title { font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-bottom:.7rem;line-height:1.3; }
+    .project-desc { font-size:.87rem;color:var(--muted);line-height:1.72;margin-bottom:1.4rem;flex:1; }
+    .project-desc code { color:var(--accent2);font-size:.85em;font-family:var(--font-mono); }
+    .project-tags { display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:1.4rem; }
+    .tag { font-family:var(--font-mono);font-size:.6rem;color:var(--accent2);background:rgba(71,200,255,0.06);border:1px solid rgba(71,200,255,0.18);padding:.2rem .5rem;border-radius:2px;letter-spacing:.04em; }
+    .project-link { font-family:var(--font-mono);font-size:.7rem;color:var(--accent);text-decoration:none;letter-spacing:.06em;text-transform:uppercase;display:inline-flex;align-items:center;gap:.4rem;transition:gap .2s;margin-top:auto; }
+    .project-link:hover { gap:.7rem; }
+    .project-highlight { position:absolute;top:1.1rem;right:1.1rem;font-family:var(--font-mono);font-size:.58rem;color:#0a0a0f;background:var(--accent);padding:.18rem .45rem;border-radius:2px;letter-spacing:.06em;text-transform:uppercase;font-weight:500; }
+
+    #experience { background:var(--surface); }
+    .exp-item { display:grid;grid-template-columns:200px 1fr;gap:3rem;padding:2.5rem 0;border-bottom:1px solid var(--border); }
+    .exp-item:first-of-type { border-top:1px solid var(--border); }
+    .exp-date { font-family:var(--font-mono);font-size:.75rem;color:var(--muted);padding-top:.3rem;letter-spacing:.04em; }
+    .exp-role { font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-bottom:.3rem; }
+    .exp-org { font-family:var(--font-mono);font-size:.8rem;color:var(--accent);margin-bottom:1rem;letter-spacing:.04em; }
+    .exp-desc { font-size:.9rem;color:var(--muted);line-height:1.7; }
+
+    #achievements { background:var(--bg); }
+    .achievements-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem; }
+    .ach-card { border:1px solid var(--border);padding:2rem;border-radius:4px;transition:border-color .2s,transform .2s;background:var(--surface); }
+    .ach-card:hover { border-color:var(--accent);transform:translateY(-4px); }
+    .ach-icon { font-size:1.8rem;margin-bottom:1rem; }
+    .ach-title { font-family:var(--font-display);font-weight:700;margin-bottom:.5rem; }
+    .ach-sub { font-size:.85rem;color:var(--muted); }
+
+    #education { background:var(--surface); }
+    .edu-timeline { position:relative;padding-left:2rem; }
+    .edu-timeline::before { content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:var(--border); }
+    .edu-item { position:relative;padding-bottom:3rem;padding-left:2rem; }
+    .edu-item::before { content:'';position:absolute;left:-2rem;top:.5rem;width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent); }
+    .edu-year { font-family:var(--font-mono);font-size:.72rem;color:var(--muted);letter-spacing:.08em;margin-bottom:.5rem; }
+    .edu-degree { font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-bottom:.25rem; }
+    .edu-school { color:var(--muted);font-size:.9rem; }
+    .edu-score { font-family:var(--font-mono);font-size:.8rem;color:var(--accent);margin-top:.4rem; }
+
+    #contact { background:var(--bg);text-align:center;padding:8rem 3rem; }
+    .contact-inner { max-width:600px;margin:0 auto; }
+    .contact-big { font-family:var(--font-display);font-size:clamp(2.5rem,6vw,5rem);font-weight:800;line-height:1;letter-spacing:-.03em;margin-bottom:1.5rem; }
+    .contact-big span { color:var(--accent); }
+    .contact-sub { color:var(--muted);margin-bottom:3rem;font-size:1rem; }
+    .contact-links { display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;margin-bottom:3rem; }
+    .contact-link { font-family:var(--font-mono);font-size:.75rem;color:var(--muted);text-decoration:none;letter-spacing:.08em;text-transform:uppercase;padding:.75rem 1.5rem;border:1px solid var(--border);border-radius:3px;transition:all .2s; }
+    .contact-link:hover { color:var(--accent);border-color:var(--accent); }
+    .email-big { font-family:var(--font-display);font-size:1.1rem;color:var(--text);text-decoration:none;border-bottom:1px solid var(--border);padding-bottom:.2rem;transition:border-color .2s,color .2s; }
+    .email-big:hover { color:var(--accent);border-color:var(--accent); }
+
+    footer { padding:2rem 3rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center; }
+    footer p { font-family:var(--font-mono);font-size:.7rem;color:var(--muted);letter-spacing:.05em; }
+
+    .reveal { opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease; }
+    .reveal.visible { opacity:1;transform:translateY(0); }
+
+    @media (max-width:768px) {
+      nav { padding:1.2rem 1.5rem; }
+      .nav-links { display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,10,15,0.98);flex-direction:column;align-items:center;justify-content:center;gap:2rem;z-index:99; }
+      .nav-links.open { display:flex; }
+      .hamburger { display:flex; }
+      section { padding:5rem 1.5rem; }
+      #hero { padding:7rem 1.5rem 4rem; }
+      .about-grid { grid-template-columns:1fr;gap:3rem; }
+      .exp-item { grid-template-columns:1fr;gap:.5rem; }
+      .hero-stats { gap:2rem; }
+      footer { flex-direction:column;gap:.5rem;text-align:center; }
+      .contact-links { flex-direction:column;align-items:center; }
+      .projects-grid { grid-template-columns:1fr;background:none;gap:1rem; }
+      .project-card { border:1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav id="nav">
+  <a class="nav-logo" href="#">YR</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#about" onclick="closeMenu()">About</a></li>
+    <li><a href="#projects" onclick="closeMenu()">Projects</a></li>
+    <li><a href="#experience" onclick="closeMenu()">Experience</a></li>
+    <li><a href="#achievements" onclick="closeMenu()">Achievements</a></li>
+    <li><a href="#education" onclick="closeMenu()">Education</a></li>
+    <li><a href="#contact" onclick="closeMenu()">Contact</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="badge-dot"></span>Available for Internships &amp; Opportunities</div>
+    <h1 class="hero-title">
+      <div>Yash</div>
+      <div class="line-accent">Raj</div>
+      <div class="line-dim" style="font-size:.55em;font-weight:600;letter-spacing:.02em;margin-top:.3em;">Software Engineer</div>
+    </h1>
+    <p class="hero-sub">Building high-performance systems and intelligent applications — from low-level C/C++ networking to full-stack web platforms and multi-agent AI pipelines.</p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn btn-primary">View Projects</a>
+      <a href="#contact" class="btn btn-outline">Get In Touch</a>
+      <a href="mailto:yash.algorithmist@gmail.com" class="btn btn-outline">Email Me</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-num">8.75</div><div class="stat-label">CGPA at KIIT</div></div>
+      <div><div class="stat-num">7+</div><div class="stat-label">Projects Shipped</div></div>
+      <div><div class="stat-num">1st</div><div class="stat-label">Hackathon Win</div></div>
+      <div><div class="stat-num">10+</div><div class="stat-label">Engineers Led</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">About</div>
+  <h2 class="section-title">Who I Am</h2>
+  <div class="about-grid reveal">
+    <div class="about-text">
+      <p>I'm a <strong>Computer Science student at KIIT University</strong> (2023–2027), passionate about building systems that are fast, secure, and scalable — from the kernel level up to the UI.</p>
+      <p>My work spans <strong>low-level C/C++ systems programming</strong>, full-stack MERN development, and AI/ML engineering — including multi-agent systems, NLP Transformers, CNN-Transformer hybrid deep learning, and production REST APIs.</p>
+      <p>As <strong>AI/ML Lead at Kinetex Lab</strong>, I progressed from Co-Lead to Lead within 4 months, directing a team of 10+ engineers across project design, code reviews, and technical workshops.</p>
+      <p>I hold an NCC 'A' Certificate (Grade A), reflecting discipline and leadership beyond the keyboard.</p>
+      <div style="margin-top:2rem;">
+        <a href="https://linkedin.com/in/yash-raj-476290369" target="_blank" class="btn btn-outline" style="margin-right:.75rem;">LinkedIn ↗</a>
+        <a href="https://github.com/algorithmist-yash" target="_blank" class="btn btn-outline">GitHub ↗</a>
+      </div>
+    </div>
+    <div>
+      <p style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;">Tech Stack</p>
+      <div class="skills-grid">
+        <span class="skill-tag">Python</span><span class="skill-tag">C / C++</span>
+        <span class="skill-tag">Java</span><span class="skill-tag">JavaScript</span>
+        <span class="skill-tag">React / Vite</span><span class="skill-tag">Node.js / Express</span>
+        <span class="skill-tag">Flask</span><span class="skill-tag">MongoDB Atlas</span>
+        <span class="skill-tag">PostgreSQL / MySQL</span><span class="skill-tag">Docker</span>
+        <span class="skill-tag">OpenSSL / pthreads</span><span class="skill-tag">TCP/IP Sockets</span>
+        <span class="skill-tag">HuggingFace</span><span class="skill-tag">Scikit-learn</span>
+        <span class="skill-tag">TensorFlow / PyTorch</span><span class="skill-tag">pandas / NumPy</span>
+        <span class="skill-tag">BeautifulSoup</span><span class="skill-tag">Git / Linux</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-label">Projects</div>
+  <h2 class="section-title">Things I've Built</h2>
+
+  <div class="filter-tabs">
+    <button class="filter-tab active" data-filter="all">All (7)</button>
+    <button class="filter-tab" data-filter="systems">Systems</button>
+    <button class="filter-tab" data-filter="fullstack">Full-Stack</button>
+    <button class="filter-tab" data-filter="ml">ML / AI</button>
+    <button class="filter-tab" data-filter="research">Research</button>
+  </div>
+
+  <div class="projects-grid reveal">
+
+    <!-- 1 -->
+    <div class="project-card" data-cat="systems">
+      <div class="project-header">
+        <span class="project-number">01 · 2025</span>
+        <span class="project-category">Systems</span>
+      </div>
+      <h3 class="project-title">High-Performance Secure Data Transfer Engine</h3>
+      <p class="project-desc">A multi-threaded TCP client-server system in C/C++ on Linux that handles 100+ concurrent connections via POSIX pthreads for scalable, low-latency communication. Integrates AES-128-CBC encryption via OpenSSL EVP and applies zero-copy buffer optimizations with <code>TCP_NODELAY</code> tuning. Performance is validated through RTT and throughput stress-tests, demonstrating production-level systems design from socket programming to encryption.</p>
+      <div class="project-tags">
+        <span class="tag">C / C++</span><span class="tag">TCP/IP Sockets</span><span class="tag">OpenSSL AES-128</span><span class="tag">pthreads</span><span class="tag">Linux</span>
+      </div>
+      <a href="https://github.com/algorithmist-yash" target="_blank" class="project-link">View on GitHub →</a>
+    </div>
+
+    <!-- 2 -->
+    <div class="project-card" data-cat="fullstack">
+      <div class="project-header">
+        <span class="project-number">02 · 2025</span>
+        <span class="project-category">Full-Stack</span>
+      </div>
+      <h3 class="project-title">URL Shortener — Full-Stack Web Application</h3>
+      <p class="project-desc">A production-grade REST API backend (Node.js + Express + MongoDB Atlas) supporting URL creation, custom TTL expiry, real-time click analytics, and manual link invalidation across 4 clean API endpoints. Architected with strict MVC separation, paired with a responsive React (Vite) frontend featuring QR code generation and live Active/Expired link status. Fully Dockerized and built through all SDLC phases from schema design through deployment.</p>
+      <div class="project-tags">
+        <span class="tag">Node.js</span><span class="tag">Express.js</span><span class="tag">React (Vite)</span><span class="tag">MongoDB Atlas</span><span class="tag">Docker</span><span class="tag">REST API</span><span class="tag">MVC</span>
+      </div>
+      <a href="https://github.com/algorithmist-yash" target="_blank" class="project-link">View on GitHub →</a>
+    </div>
+
+    <!-- 3 -->
+    <div class="project-card" data-cat="ml">
+      <div class="project-highlight">🏆 1st Place</div>
+      <div class="project-header">
+        <span class="project-number">03 · 2024</span>
+        <span class="project-category">ML / AI</span>
+      </div>
+      <h3 class="project-title">Review Sentiment Analyzer — Dockerized REST API</h3>
+      <p class="project-desc">A production-ready text classification backend that classifies user reviews as positive or negative via a clean <code>/predict</code> REST endpoint. Achieved 90% accuracy using TF-IDF feature engineering and Logistic Regression — earning 1st place at the KONNEX Hackathon. The repo also includes additional ML notebooks (diabetes and heart disease prediction) built during Kinetex Lab workshops. Fully containerized with Docker across all SDLC phases.</p>
+      <div class="project-tags">
+        <span class="tag">Python</span><span class="tag">Flask</span><span class="tag">Scikit-learn</span><span class="tag">TF-IDF</span><span class="tag">Logistic Regression</span><span class="tag">Docker</span><span class="tag">REST API</span>
+      </div>
+      <a href="https://github.com/algorithmist-yash/Sentiment-Analyzer" target="_blank" class="project-link">View on GitHub →</a>
+    </div>
+
+    <!-- 4 -->
+    <div class="project-card" data-cat="ml">
+      <div class="project-header">
+        <span class="project-number">04 · 2025</span>
+        <span class="project-category">ML / AI</span>
+      </div>
+      <h3 class="project-title">InsightPilot — Autonomous Multi-Agent EDA System</h3>
+      <p class="project-desc">An AI-powered multi-agent pipeline that performs complete end-to-end exploratory data analysis on any tabular dataset with zero manual intervention. Six specialized agents work in sequence: Planner (sets workflow), Cleaning (handles missing/invalid data), EDA (descriptive stats), Visualization (histograms, heatmaps), Modeling (Logistic Regression + Random Forest baselines if a target exists), and Reporter (compiles a Markdown summary). Outputs include CSV reports, PNG charts, JSON model results, and a full agent audit log.</p>
+      <div class="project-tags">
+        <span class="tag">Python</span><span class="tag">Multi-Agent</span><span class="tag">pandas</span><span class="tag">Scikit-learn</span><span class="tag">matplotlib</span><span class="tag">seaborn</span><span class="tag">Apache-2.0</span>
+      </div>
+      <a href="https://github.com/algorithmist-yash/InsightPilot" target="_blank" class="project-link">View on GitHub →</a>
+    </div>
+
+    <!-- 5 -->
+    <div class="project-card" data-cat="ml">
+      <div class="project-header">
+        <span class="project-number">05 · 2025</span>
+        <span class="project-category">ML / AI</span>
+      </div>
+      <h3 class="project-title">AI News Summarizer — Transformer NLP Pipeline</h3>
+      <p class="project-desc">An automated news summarization system that fetches articles from online sources, strips HTML and normalizes text via BeautifulSoup, then runs them through HuggingFace Transformer models (BART / T5) to generate concise summaries — reducing reading time by up to 60% while preserving key facts. Built as a modular pipeline (fetcher → cleaner → summarizer) that is easily extended with new APIs, batch modes, or ROUGE/BERTScore evaluation. Demonstrates real-world NLP engineering from ingestion to inference.</p>
+      <div class="project-tags">
+        <span class="tag">Python</span><span class="tag">HuggingFace</span><span class="tag">BART / T5</span><span class="tag">Transformers</span><span class="tag">BeautifulSoup</span><span class="tag">pandas</span>
+      </div>
+      <a href="https://github.com/algorithmist-yash/ai-news-summarizer" target="_blank" class="project-link">View on GitHub →</a>
+    </div>
+
+    <!-- 6 -->
+    <div class="project-card" data-cat="research">
+      <div class="project-header">
+        <span class="project-number">06 · 2025</span>
+        <span class="project-category">Research</span>
+      </div>
+      <h3 class="project-title">Hybrid CNN–Transformer for Medical Imaging</h3>
+      <p class="project-desc">A deep learning research notebook implementing a Unified Optimized Hybrid CNN–Transformer architecture for medical image classification on Kaggle. The model fuses CNN's local spatial feature extraction with Transformer's global attention mechanism, covering end-to-end deep learning: data preprocessing, custom architecture design, training loops, and evaluation metrics. Demonstrates applied knowledge of state-of-the-art architectures beyond standard classification baselines, built in TensorFlow/PyTorch.</p>
+      <div class="project-tags">
+        <span class="tag">Python</span><span class="tag">CNN</span><span class="tag">Transformer</span><span class="tag">TensorFlow / PyTorch</span><span class="tag">Deep Learning</span><span class="tag">Kaggle</span>
+      </div>
+      <a href="https://github.com/algorithmist-yash/Medical-research" target="_blank" class="project-link">View on GitHub →</a>
+    </div>
+
+    <!-- 7 -->
+    <div class="project-card" data-cat="ml">
+      <div class="project-header">
+        <span class="project-number">07 · 2024–25</span>
+        <span class="project-category">ML / AI</span>
+      </div>
+      <h3 class="project-title">AI-ML Learning Projects — Applied ML Notebook Collection</h3>
+      <p class="project-desc">A structured collection of hands-on ML notebooks covering the full spectrum of applied machine learning: supervised classification, regression, feature engineering, hyperparameter tuning, and model evaluation. Built during active learning and as teaching material during Kinetex Lab workshops, each notebook follows a systematic approach — EDA → preprocessing → model training → evaluation. Topics span Scikit-learn pipelines, data wrangling with pandas/NumPy, and visualization with matplotlib/seaborn.</p>
+      <div class="project-tags">
+        <span class="tag">Python</span><span class="tag">Scikit-learn</span><span class="tag">pandas</span><span class="tag">NumPy</span><span class="tag">Jupyter</span><span class="tag">EDA</span><span class="tag">Feature Engineering</span>
+      </div>
+      <a href="https://github.com/algorithmist-yash/AI-ML-LEARNING-PROJECTS" target="_blank" class="project-link">View on GitHub →</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-label">Experience</div>
+  <h2 class="section-title">Leadership &amp; Work</h2>
+  <div class="reveal">
+    <div class="exp-item">
+      <div class="exp-date">Sep 2025 — Feb 2026</div>
+      <div>
+        <div class="exp-role">AI / ML Lead</div>
+        <div class="exp-org">Kinetex Lab, KIIT Chapter · Bhubaneswar, India</div>
+        <p class="exp-desc">Progressed from Co-Lead to Lead within 4 months, directing 10+ ML engineers on project design, code reviews, and technical workshops. Drove collaborative problem-solving and engineering best-practice initiatives. Mentored juniors on model development, debugging workflows, and systematic SDLC execution. Oversaw ML projects including medical prediction models, NLP systems, and team-led EDA pipelines.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACHIEVEMENTS -->
+<section id="achievements">
+  <div class="section-label">Achievements</div>
+  <h2 class="section-title">Recognition</h2>
+  <div class="achievements-grid reveal">
+    <div class="ach-card">
+      <div class="ach-icon">🏆</div>
+      <div class="ach-title">KONNEX Hackathon — 1st Place</div>
+      <div class="ach-sub">Built an AI Sentiment Classifier with 90% accuracy (TF-IDF + Logistic Regression) that won 1st place at the KONNEX Hackathon. 2024.</div>
+    </div>
+    <div class="ach-card">
+      <div class="ach-icon">🎖️</div>
+      <div class="ach-title">NCC 'A' Certificate — Grade A</div>
+      <div class="ach-sub">National Cadet Corps certification (Grade A) recognizing leadership, discipline, and commitment to service.</div>
+    </div>
+    <div class="ach-card">
+      <div class="ach-icon">📜</div>
+      <div class="ach-title">3 Coursera Certifications</div>
+      <div class="ach-sub">Industry-recognized certificates in software engineering and data systems completed in 2024–2025.</div>
+    </div>
+    <div class="ach-card">
+      <div class="ach-icon">⚡</div>
+      <div class="ach-title">Active Coding Profiles</div>
+      <div class="ach-sub">Consistent practice on LeetCode (algorithmist-yash) and HackerRank (yash_algorithmi1) in DSA &amp; algorithms.</div>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="section-label">Education</div>
+  <h2 class="section-title">Academic Journey</h2>
+  <div class="edu-timeline reveal">
+    <div class="edu-item">
+      <div class="edu-year">2023 — 2027</div>
+      <div class="edu-degree">B.Tech in Computer Science &amp; Engineering</div>
+      <div class="edu-school">Kalinga Institute of Industrial Technology (KIIT) · Bhubaneswar, India</div>
+      <div class="edu-score">CGPA: 8.75 / 10.0 · No Backlogs</div>
+    </div>
+    <div class="edu-item">
+      <div class="edu-year">2022</div>
+      <div class="edu-degree">Class XII — CBSE</div>
+      <div class="edu-school">Holy Mission Senior Secondary School · Patna, India</div>
+      <div class="edu-score">Percentage: 87.6%</div>
+    </div>
+    <div class="edu-item">
+      <div class="edu-year">2020</div>
+      <div class="edu-degree">Class X — CBSE</div>
+      <div class="edu-school">Sainik School Chittorgarh · Rajasthan, India</div>
+      <div class="edu-score">Score: 90%</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner reveal">
+    <div class="section-label" style="justify-content:center;">Contact</div>
+    <h2 class="contact-big">Let's <span>build</span><br>something.</h2>
+    <p class="contact-sub">Open to internships, full-time roles, and interesting problems. Drop me a line.</p>
+    <div class="contact-links">
+      <a href="https://linkedin.com/in/yash-raj-476290369" target="_blank" class="contact-link">LinkedIn ↗</a>
+      <a href="https://github.com/algorithmist-yash" target="_blank" class="contact-link">GitHub ↗</a>
+      <a href="https://leetcode.com/algorithmist-yash" target="_blank" class="contact-link">LeetCode ↗</a>
+      <a href="https://www.hackerrank.com/yash_algorithmi1" target="_blank" class="contact-link">HackerRank ↗</a>
+    </div>
+    <a href="mailto:yash.algorithmist@gmail.com" class="email-big">yash.algorithmist@gmail.com</a>
+    <br><br>
+    <p style="font-family:var(--font-mono);font-size:.75rem;color:var(--muted);">+91-8797053635</p>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 Yash Raj. Built with intention.</p>
+  <p>KIIT · B.Tech CSE · 2023–2027</p>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px';});
+  (function loop(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);})();
+  document.querySelectorAll('a,button').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{cursor.style.width='16px';cursor.style.height='16px';ring.style.width='56px';ring.style.height='56px';});
+    el.addEventListener('mouseleave',()=>{cursor.style.width='10px';cursor.style.height='10px';ring.style.width='36px';ring.style.height='36px';});
+  });
+
+  // Nav scroll
+  window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',window.scrollY>30));
+
+  // Mobile menu
+  function toggleMenu(){document.getElementById('navLinks').classList.toggle('open');}
+  function closeMenu(){document.getElementById('navLinks').classList.remove('open');}
+
+  // Scroll reveal
+  const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+  // Project filters
+  document.querySelectorAll('.filter-tab').forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+      tab.classList.add('active');
+      const f=tab.dataset.filter;
+      document.querySelectorAll('.project-card').forEach(card=>{
+        card.classList.toggle('hidden', f!=='all' && card.dataset.cat!==f);
+      });
+    });
+  });
+</script>
+</body>
+</html>
